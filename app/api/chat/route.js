@@ -7,11 +7,9 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
-const systemPrompt =
-  "You are an expert programming chat bot assistant. Your task is to provide clear, concise, and accurate answers to technical questions about programming. Use examples where necessary and ensure your explanations are easy to understand. Do not provide code as am example. Provide answer without hypermarkups.";
-
 export async function POST(req) {
   const data = await req.json();
+  const { messages, systemPrompt } = data;
 
   let response;
   try {
@@ -21,7 +19,7 @@ export async function POST(req) {
           role: "system",
           content: systemPrompt,
         },
-        ...data,
+        ...messages,
       ],
       model: "llama3-8b-8192",
     });
