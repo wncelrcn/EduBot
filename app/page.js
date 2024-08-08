@@ -19,6 +19,10 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
 import { BsRobot } from "react-icons/bs";
 import { FaPaperPlane } from "react-icons/fa";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/app/firebase/config";
+import { useRouter } from "next/navigation";
+import { signOut } from "firebase/auth";
 
 export default function Home() {
   const systemPrompts = {
@@ -51,6 +55,9 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const[ user ] = useAuthState(auth);
+  const router = useRouter();
+  const userSession = sessionStorage.getItem("user");
 
   const theme = createTheme({
     palette: {
@@ -159,6 +166,10 @@ export default function Home() {
         return null;
     }
   };
+
+  // if (!user || !userSession) {
+  //   router.push("/login");
+  // }
 
   return (
     <ThemeProvider theme={theme}>
