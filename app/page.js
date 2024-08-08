@@ -12,9 +12,13 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Icon,
+  IconButton
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
+import { BsRobot } from "react-icons/bs";
+import { FaPaperPlane } from "react-icons/fa";
 
 export default function Home() {
   const systemPrompts = {
@@ -158,136 +162,162 @@ export default function Home() {
 
   return (
     <ThemeProvider theme={theme}>
+  <Box
+    width="100vw"
+    height="100vh"
+    display="flex"
+    flexDirection="row"
+    bgcolor="background.default"
+    color="text.primary"
+  >
+    {/* Sidebar */}
+    <Drawer
+      variant="permanent"
+      sx={{
+        width: 240,
+        flexShrink: 0,
+        [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box", bgcolor: 'background.paper' },
+      }}
+    >
       <Box
-        width="100vw"
-        height="100vh"
-        display="flex"
-        flexDirection="row"
-        bgcolor="background.paper"
-        color="text.primary"
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          mt: 2,
+          mb: 2,
+        }}
       >
-        <Drawer
-          variant="permanent"
+        <BsRobot size={24} />
+        <Box ml={1}></Box>
+        <Typography variant="h6">EduBot</Typography>
+      </Box>
+      
+      <List>
+        {Object.keys(systemPrompts).map((text) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton onClick={() => handleBotClick(text)}>
+              {getIcon(text)}
+              <ListItemText sx={{ mx: 2 }} primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+    </Drawer>
+
+    {/* Main Chat Area */}
+    <Box
+      width="100%"
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+      alignItems="center"
+    >
+      <Stack
+        direction="column"
+        width="100%"
+        height="100%"
+        border="1px solid"
+        borderColor="grey.300"
+        borderRadius={2}
+        p={2}
+        spacing={3}
+      >
+        <Typography variant="h6" textAlign="center" sx={{ fontSize: 'h6.fontSize', fontWeight: 'bold'}}>
+          {chatBot}
+        </Typography>
+
+        <Stack
+          direction="column"
+          spacing={2}
+          flexGrow={1}
+          overflow="auto"
+          maxHeight="100%"
           sx={{
-            width: 240,
-            flexShrink: 0,
-            [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box" },
+            "::-webkit-scrollbar": {
+              display: "none",
+            },
+            msOverflowStyle: "none",
+            scrollbarWidth: "none",
           }}
         >
-          <List>
-            {Object.keys(systemPrompts).map((text) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton onClick={() => handleBotClick(text)}>
-                  {getIcon(text)}
-                  <ListItemText sx={{ mx: 2 }} primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-        <Box
-          width="100%"
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Stack
-            direction="column"
-            width="600px"
-            height="700px"
-            border="1px solid"
-            borderColor="grey.300"
-            borderRadius={2}
-            p={2}
-            spacing={3}
-          >
-            <Typography variant="h6" textAlign="center">
-              {chatBot}
-            </Typography>
-            <Stack
-              direction="column"
-              spacing={2}
-              flexGrow={1}
-              overflow="auto"
-              maxHeight="100%"
-              sx={{
-                "::-webkit-scrollbar": {
-                  display: "none",
-                },
-                msOverflowStyle: "none",
-                scrollbarWidth: "none",
-              }}
+          {messages.map((message, index) => (
+            <Box
+              key={index}
+              display="flex"
+              justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
             >
-              {messages.map((message, index) => (
-                <Box
-                  key={index}
-                  display="flex"
-                  justifyContent={
-                    message.role === "assistant" ? "flex-start" : "flex-end"
-                  }
-                >
-                  <Box
-                    bgcolor={
-                      message.role === "assistant" ? "#f2f2f2" : "#ded1eb"
-                    }
-                    color={message.role === "assistant" ? "#000000" : "#5a189a"}
-                    borderRadius={10}
-                    p={2}
-                    sx={{
-                      wordWrap: "break-word",
-                      maxWidth: "75%",
-                      mx: 1,
-                      px: 3,
-                    }}
-                  >
-                    <ReactMarkdown>{message.content}</ReactMarkdown>
-                  </Box>
-                </Box>
-              ))}
-              <div ref={messagesEndRef} />
-            </Stack>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <TextField
-                label="Enter your message"
-                fullWidth
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                disabled={isLoading}
+              <Box
+                bgcolor={message.role === "assistant" ? "#f2f2f2" : "#ded1eb"}
+                color={message.role === "assistant" ? "#000000" : "#5a189a"}
+                borderRadius={10}
+                p={2}
                 sx={{
-                  "& .MuiOutlinedInput-root": {
-                    "&.Mui-focused fieldset": {
-                      borderColor: "#5a189a",
-                    },
-                  },
-                  "& .MuiInputLabel-root": {
-                    "&.Mui-focused": {
-                      color: "#5a189a",
-                    },
-                  },
-                }}
-              />
-              <Button
-                variant="contained"
-                onClick={sendMessage}
-                disabled={isLoading}
-                sx={{
-                  backgroundColor: "#5a189a",
-                  "&:hover": {
-                    backgroundColor: "#7b2cbf",
-                  },
+                  wordWrap: "break-word",
+                  whiteSpace: "pre-wrap",
+                  maxWidth: "75%",
+                  mx: 1,
+                  boxShadow: 3,
                 }}
               >
-                {isLoading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Send"
-                )}
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
-      </Box>
-    </ThemeProvider>
+                <ReactMarkdown>{message.content}</ReactMarkdown>
+              </Box>
+            </Box>
+          ))}
+          <div ref={messagesEndRef} />
+        </Stack>
+        
+        {/* Message Input */}
+        <Stack direction="row" spacing={2} alignItems="center">
+          <TextField
+            label="Message EduBot"
+            fullWidth
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            disabled={isLoading}
+            sx={{
+              "& .MuiOutlinedInput-root": {
+                "&.Mui-focused fieldset": {
+                  borderColor: "#5a189a",
+                },
+              },
+              "& .MuiInputLabel-root": {
+                "&.Mui-focused": {
+                  color: "#5a189a",
+                },
+              },
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={sendMessage}
+            disabled={isLoading}
+            sx={{
+              width: 48,
+              height: 48,
+              minWidth: 48,
+              backgroundColor: "#5a189a",
+              borderRadius: "50%",
+              "&:hover": {
+                backgroundColor: "#7b2cbf",
+              },
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: 2,
+            }}
+          >
+            {isLoading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              <FaPaperPlane size={16} />
+            )}
+          </Button>
+        </Stack>
+      </Stack>
+    </Box>
+  </Box>
+</ThemeProvider>
+
   );
 }
