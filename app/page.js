@@ -12,7 +12,6 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  
 } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ReactMarkdown from "react-markdown";
@@ -22,7 +21,6 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
-
 
 export default function Home() {
   const systemPrompts = {
@@ -55,9 +53,9 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const[ user ] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   const router = useRouter();
-  const userSession = sessionStorage.getItem('user');
+  const userSession = sessionStorage.getItem("user");
 
   const theme = createTheme({
     palette: {
@@ -127,10 +125,20 @@ export default function Home() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      sessionStorage.removeItem('user');
+      sessionStorage.removeItem("user");
     } catch (err) {
-      console.error('Failed to log out:', err);
+      console.error("Failed to log out:", err);
     }
+  };
+
+  const getProfile = (text) => {
+    return (
+      <img
+        src={`images/${text}.png`}
+        alt="EduBot Logo"
+        style={{ width: "70px", height: "auto", margin: "20px" }}
+      />
+    );
   };
 
   const getIcon = (text) => {
@@ -176,8 +184,8 @@ export default function Home() {
     }
   };
 
-  console.log('user:', user);
-  console.log('userSession:', userSession);
+  console.log("user:", user);
+  console.log("userSession:", userSession);
 
   if (!user && !userSession) {
     router.push("/login");
@@ -185,211 +193,258 @@ export default function Home() {
 
   return (
     <ThemeProvider theme={theme}>
-  <Box
-    width="100vw"
-    height="100vh"
-    display="flex"
-    flexDirection="row"
-    bgcolor="background.default"
-    color="text.primary"
-  >
-    {/* Sidebar */}
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: 240,
-        flexShrink: 0,
-        [`& .MuiDrawer-paper`]: { width: 240, boxSizing: "border-box", bgcolor: 'background.paper' },
-      }}
-    >
       <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          mt: 2,
-          mb: 2,
-        }}
+        width="100vw"
+        height="100vh"
+        display="flex"
+        flexDirection="row"
+        bgcolor="background.default"
+        color="text.primary"
       >
-        <BsRobot size={24} />
-        <Box ml={1}></Box>
-        <Typography variant="h6">EduBot</Typography>
-      </Box>
-      
-      <List>
-        {Object.keys(systemPrompts).map((text) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton onClick={() => handleBotClick(text)}>
-              {getIcon(text)}
-              <ListItemText sx={{ mx: 2 }} primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      
-
-      {/* Current User and Log Out Section */}
-      {user && (
-        <Box
+        {/* Sidebar */}
+        <Drawer
+          variant="permanent"
           sx={{
-            mt: 'auto',
-            p: 2,
+            width: 240,
+            justifyContent: "center",
+            alignItems: "center",
+            flexShrink: 0,
+            [`& .MuiDrawer-paper`]: {
+              width: 240,
+              boxSizing: "border-box",
+              bgcolor: "background.paper",
+            },
           }}
         >
-          {/* User Info Section */}
           <Box
             sx={{
-              display: 'flex',
-              alignItems: 'center',
-              mb: 2,  // Adds some space between the user info and the logout button
-            }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5a189a">
-              <path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z" />
-            </svg>
-            <Typography variant="body1" sx={{ ml: 1, fontSize: "12px" }}>
-              {user.email}
-            </Typography>
-          </Box>
-
-          {/* Logout Button */}
-          <Button
-            variant="text"
-            fullWidth
-            color="inherit"
-            onClick={handleLogout}
-            
-            startIcon={
-              <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#5a189a">
-                <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
-              </svg>
-            }
-            sx={{
-              justifyContent: 'flex-start',
-              color: 'text.primary',
-              textTransform: 'none',
-              fontSize: '1rem',
-            }}
-          >
-            Log out
-          </Button>
-        </Box>
-      )}
-    </Drawer>
-
-    {/* Main Chat Area */}
-    <Box
-      width="100%"
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Stack
-        direction="column"
-        width="100%"
-        height="100%"
-        border="1px solid"
-        borderColor="grey.300"
-        borderRadius={2}
-        p={2}
-        spacing={3}
-      >
-        <Typography variant="h6" textAlign="center" sx={{ fontSize: 'h6.fontSize', fontWeight: 'bold'}}>
-          {chatBot}
-        </Typography>
-
-        <Stack
-          direction="column"
-          spacing={2}
-          flexGrow={1}
-          overflow="auto"
-          maxHeight="100%"
-          sx={{
-            "::-webkit-scrollbar": {
-              display: "none",
-            },
-            msOverflowStyle: "none",
-            scrollbarWidth: "none",
-          }}
-        >
-          {messages.map((message, index) => (
-            <Box
-              key={index}
-              display="flex"
-              justifyContent={message.role === "assistant" ? "flex-start" : "flex-end"}
-            >
-              <Box
-                bgcolor={message.role === "assistant" ? "#f2f2f2" : "#ded1eb"}
-                color={message.role === "assistant" ? "#000000" : "#5a189a"}
-                borderRadius={10}
-                p={2}
-                sx={{
-                  wordWrap: "break-word",
-                  whiteSpace: "pre-wrap",
-                  maxWidth: "75%",
-                  mx: 1,
-                  boxShadow: 3,
-                }}
-              >
-                <ReactMarkdown>{message.content}</ReactMarkdown>
-              </Box>
-            </Box>
-          ))}
-          <div ref={messagesEndRef} />
-        </Stack>
-        
-        {/* Message Input */}
-        <Stack direction="row" spacing={2} alignItems="center">
-          <TextField
-            label="Message EduBot"
-            fullWidth
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            disabled={isLoading}
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                "&.Mui-focused fieldset": {
-                  borderColor: "#5a189a",
-                },
-              },
-              "& .MuiInputLabel-root": {
-                "&.Mui-focused": {
-                  color: "#5a189a",
-                },
-              },
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={sendMessage}
-            disabled={isLoading}
-            sx={{
-              width: 48,
-              height: 48,
-              minWidth: 48,
-              backgroundColor: "#5a189a",
-              borderRadius: "50%",
-              "&:hover": {
-                backgroundColor: "#7b2cbf",
-              },
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              boxShadow: 2,
+              mt: 2,
+              mb: 2,
             }}
           >
-            {isLoading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              <FaPaperPlane size={16} />
-            )}
-          </Button>
-        </Stack>
-      </Stack>
-    </Box>
-  </Box>
-</ThemeProvider>
+            <Box ml={1}></Box>
 
+            <Typography variant="h6">EduBot</Typography>
+          </Box>
+
+          <List>
+            {Object.keys(systemPrompts).map((text) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton onClick={() => handleBotClick(text)}>
+                  {getIcon(text)}
+                  <ListItemText sx={{ mx: 2 }} primary={text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          {/* Current User and Log Out Section */}
+          {user && (
+            <Box
+              sx={{
+                mt: "auto",
+                p: 2,
+              }}
+            >
+              {/* User Info Section */}
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  mb: 2, // Adds some space between the user info and the logout button
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  height="24px"
+                  viewBox="0 -960 960 960"
+                  width="24px"
+                  fill="#5a189a"
+                >
+                  <path d="M234-276q51-39 114-61.5T480-360q69 0 132 22.5T726-276q35-41 54.5-93T800-480q0-133-93.5-226.5T480-800q-133 0-226.5 93.5T160-480q0 59 19.5 111t54.5 93Zm246-164q-59 0-99.5-40.5T340-580q0-59 40.5-99.5T480-720q59 0 99.5 40.5T620-580q0 59-40.5 99.5T480-440Zm0 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Z" />
+                </svg>
+                <Typography variant="body1" sx={{ ml: 1, fontSize: "12px" }}>
+                  {user.email}
+                </Typography>
+              </Box>
+
+              {/* Logout Button */}
+              <Button
+                variant="text"
+                fullWidth
+                color="inherit"
+                onClick={handleLogout}
+                startIcon={
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    height="24px"
+                    viewBox="0 -960 960 960"
+                    width="24px"
+                    fill="#5a189a"
+                  >
+                    <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+                  </svg>
+                }
+                sx={{
+                  justifyContent: "flex-start",
+                  color: "text.primary",
+                  textTransform: "none",
+                  fontSize: "1rem",
+                }}
+              >
+                Log out
+              </Button>
+            </Box>
+          )}
+        </Drawer>
+
+        {/* Main Chat Area */}
+
+        <Box
+          width="100%"
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Stack
+            direction="column"
+            width="100%"
+            height="100%"
+            border="1px solid"
+            borderColor="grey.300"
+            borderRadius={2}
+            // p={2}
+            spacing={3}
+          >
+            <Stack
+              direction="row"
+              backgroundColor="#5a189a"
+              width="100%"
+              height="10%"
+              alignItems={"center"}
+            >
+              {getProfile(chatBot)}
+
+              <Stack direction="column" alignItems={"flex-start"}>
+                <Typography
+                  variant="h6"
+                  textAlign="center"
+                  color={"#ffffff"}
+                  sx={{ fontWeight: "bold" }}
+                >
+                  {chatBot}
+                </Typography>
+                <Typography textAlign="center" color={"#ffffff"}>
+                  Ask me anything!
+                </Typography>
+              </Stack>
+            </Stack>
+            <Stack
+              direction="column"
+              spacing={2}
+              flexGrow={1}
+              overflow="auto"
+              maxHeight="100%"
+              px={4}
+              sx={{
+                "::-webkit-scrollbar": {
+                  display: "none",
+                },
+                msOverflowStyle: "none",
+                scrollbarWidth: "none",
+              }}
+            >
+              {messages.map((message, index) => (
+                <Box
+                  key={index}
+                  display="flex"
+                  justifyContent={
+                    message.role === "assistant" ? "flex-start" : "flex-end"
+                  }
+                >
+                  <Box
+                    bgcolor={
+                      message.role === "assistant" ? "#f2f2f2" : "#ded1eb"
+                    }
+                    color={message.role === "assistant" ? "#000000" : "#5a189a"}
+                    borderRadius={10}
+                    p={2}
+                    sx={{
+                      wordWrap: "break-word",
+                      whiteSpace: "pre-wrap",
+                      maxWidth: "75%",
+                      mx: 1,
+                      boxShadow: 3,
+                    }}
+                  >
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </Box>
+                </Box>
+              ))}
+              <div ref={messagesEndRef} />
+            </Stack>
+
+            {/* Message Input */}
+            <Stack
+              direction="row"
+              spacing={2}
+              alignItems="center"
+              px={2}
+              pb={2}
+            >
+              <TextField
+                autoComplete="off"
+                label="Message EduBot"
+                fullWidth
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                disabled={isLoading}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#5a189a",
+                    },
+                  },
+                  "& .MuiInputLabel-root": {
+                    "&.Mui-focused": {
+                      color: "#5a189a",
+                    },
+                  },
+                }}
+              />
+              <Button
+                variant="contained"
+                onClick={sendMessage}
+                disabled={isLoading}
+                sx={{
+                  width: 48,
+                  height: 48,
+                  minWidth: 48,
+                  backgroundColor: "#5a189a",
+                  borderRadius: "50%",
+                  "&:hover": {
+                    backgroundColor: "#7b2cbf",
+                  },
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: 2,
+                }}
+              >
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  <FaPaperPlane size={16} />
+                )}
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+      </Box>
+    </ThemeProvider>
   );
 }
