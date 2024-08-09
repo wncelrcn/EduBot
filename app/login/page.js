@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Container, Typography, TextField, Button, Box } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Link } from '@mui/material';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { auth } from '@/app/firebase/config';
 import { useRouter } from 'next/navigation';
-
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,81 +12,158 @@ export default function Login() {
   const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
   const router = useRouter();
 
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-        const res = await signInWithEmailAndPassword(email, password);
-        console.log(res);
-        setEmail('');
-        setPassword('');
-        router.push('/');
-    }
-    catch (err) {
-        console.error(err);
+      const res = await signInWithEmailAndPassword(email, password);
+      console.log(res);
+      setEmail('');
+      setPassword('');
+      sessionStorage.setItem('user', true);
+      
+      router.push('/');
+    } catch (err) {
+      console.error(err);
     }
   };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container
+      component="main"
+      maxWidth={false}
+      disableGutters
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        minHeight: '100vh',
+        backgroundColor: '#EBEFFF',
+        backgroundImage: 'url("/images/EduBot.png")',
+        backgroundSize: '50% 100%',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'left',
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100vh',
+          width: { xs: '100%', md: '50%', lg: '40%' }, 
+          mr: { xs: 0, md: 0, lg: 5 },
+          height: '95vh',
+          boxShadow: 3,
+          borderRadius: 2,
+          overflow: 'hidden',
+          backgroundColor: '#615dfa',
+          padding: 10,
+          
+          justifyContent: 'center', // Center the login form
+          alignItems: 'center',    // Center the login form
         }}
       >
-        <Typography component="h1" variant="h5">
-          Login
-        </Typography>
+
+        {/* Right side login form */}
         <Box
-          component="form"
-          onSubmit={handleSubmit}
           sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
             width: '100%',
-            marginTop: 1,
+            maxWidth: '400px',
           }}
         >
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            id="email"
-            label="Email Address"
-            name="email"
-            autoComplete="email"
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <TextField
-            variant="outlined"
-            margin="normal"
-            required
-            fullWidth
-            name="password"
-            label="Password"
-            type="password"
-            id="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            color="primary"
+          <Typography component="h1" variant="h3" sx={{ color: '#ffffff', marginBottom: 4, fontSize: '35px'}}>
+            Login to EduBot
+          </Typography>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
             sx={{
-              marginTop: 3,
-              marginBottom: 2,
+              width: '100%',
             }}
           >
-            Login
-          </Button>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="email"
+              label="Email"
+              name="email"
+              autoComplete="email"
+              autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{
+                backgroundColor: '#ffffff',
+                borderRadius: 1,
+                '& label': { color: '#615dfa' },
+                '& input': { color: '#615dfa' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                },
+              }}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              sx={{
+                backgroundColor: '#ffffff',
+                borderRadius: 1,
+                '& label': { color: '#615dfa' },
+                '& input': { color: '#615dfa' },
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#ffffff',
+                  },
+                },
+              }}
+            />
+            <Button
+              type="submit"
+              fullWidth
+              variant="contained"
+              sx={{
+                marginTop: 3,
+                marginBottom: 2,
+                backgroundColor: '#ffffff',
+                color: '#615dfa',
+                fontWeight: 'bold',
+                padding: '10px 0',
+                '&:hover': {
+                  backgroundColor: '#e0e0e0',
+                },
+              }}
+            >
+              Login
+            </Button>
+            <Link href="/signup" variant="body2" sx={{ color: '#ffffff', display: 'block', textAlign: 'center', marginTop: 2 }}>
+              Don’t have an account? Sign Up
+            </Link>
+          </Box>
         </Box>
       </Box>
     </Container>
