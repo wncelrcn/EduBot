@@ -30,6 +30,8 @@ export default function Home() {
       "You are an expert in grammar. Provide precise, clear, and accurate answers only for grammar and writing questions. Use examples to illustrate rules where applicable. Do not address topics outside of grammar. Provide answers in text only.",
     "Research Assistant":
       "You are an expert in research. Provide clear, concise, and accurate answers solely for research-related questions. Use examples to explain processes and concepts as needed. Do not address topics outside of research. Provide answers in text only.",
+    "Plagiarism Checker":
+      "You are an expert in plagiarism. Provide clear, concise, and accurate answers solely for plagiarism-related questions. Analyze the given text to determine if it contains any plagiarized content by comparing it to existing sources. Provide a report indicating whether the text is original, partially plagiarized, or fully plagiarized. Include specific references to any matched sources. f any part of the text is found to be plagiarized, paraphrase those sections to make the text original while maintaining the original meaning. Provide a report indicating whether the text was plagiarized and include both the original and paraphrased versions of any problematic sections. Use examples to explain concepts as needed. Do not address topics outside of plagiarism. Provide answers in text only.",
   };
 
   const [chatBot, setChatBot] = useState("Coding Bot");
@@ -179,6 +181,9 @@ export default function Home() {
             <path d="M560-564v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-600q-38 0-73 9.5T560-564Zm0 220v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-380q-38 0-73 9t-67 27Zm0-110v-68q33-14 67.5-21t72.5-7q26 0 51 4t49 10v64q-24-9-48.5-13.5T700-490q-38 0-73 9.5T560-454ZM260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" />
           </svg>
         );
+      case "Plagiarism Checker":
+        return (
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#8C1AF6"><path d="M458-280q18 0 35.5-4.5T526-298l98 98 56-56-98-98q9-15 13.5-32.5T600-422q0-58-41-98t-99-40q-58 0-99 41t-41 99q0 58 40 99t98 41Zm2-80q-25 0-42.5-17.5T400-420q0-25 17.5-42.5T460-480q25 0 42.5 17.5T520-420q0 25-17.5 42.5T460-360ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg> )
       default:
         return null;
     }
@@ -367,18 +372,17 @@ export default function Home() {
                   }
                 >
                   <Box
-                    bgcolor={
-                      message.role === "assistant" ? "#f2f2f2" : "#ded1eb"
-                    }
+                    bgcolor={message.role === "assistant" ? "#f2f2f2" : "#ded1eb"}
                     color={message.role === "assistant" ? "#000000" : "#5a189a"}
                     borderRadius={10}
                     p={2}
                     sx={{
                       wordWrap: "break-word",
                       whiteSpace: "pre-wrap",
-                      maxWidth: "75%",
+                      maxWidth: "85%",  // Increased from 75%
                       mx: 1,
                       boxShadow: 3,
+                      overflowX: "auto",  // Allow horizontal scroll if content overflows
                     }}
                   >
                     <ReactMarkdown>{message.content}</ReactMarkdown>
@@ -387,6 +391,7 @@ export default function Home() {
               ))}
               <div ref={messagesEndRef} />
             </Stack>
+
 
             {/* Message Input */}
             <Stack

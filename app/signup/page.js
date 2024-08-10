@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
-  TextField,
   Button,
   Box,
   Link,
   Input,
+  Alert,
 } from "@mui/material";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
@@ -19,10 +19,24 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [createUserWithEmailAndPassword, user, loading, signUpError] =
+    useCreateUserWithEmailAndPassword(auth);
   const router = useRouter();
 
-  const [createUserWithEmailAndPassword] =
-    useCreateUserWithEmailAndPassword(auth);
+  useEffect(() => {
+    if (signUpError) {
+      // Check Firebase error codes for more specific messages
+      if (signUpError.code === "auth/weak-password") {
+        setError("Password is too weak. Please use a stronger password.");
+      } else if (signUpError.code === "auth/email-already-in-use") {
+        setError("This email is already in use. Please use a different email.");
+      } else {
+        setError("Failed to create an account");
+      }
+    } else {
+      setError("");
+    }
+  }, [signUpError]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -34,15 +48,14 @@ export default function SignUp() {
 
     try {
       const res = await createUserWithEmailAndPassword(email, password);
-      console.log(res);
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setError("");
-      router.push("/login");
+      if (res) {
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        router.push("/login");
+      }
     } catch (err) {
       console.error(err);
-      setError("Failed to create an account");
     }
   };
 
@@ -186,8 +199,6 @@ export default function SignUp() {
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              error={!!error}
-              helperText={error}
               sx={{
                 padding: "12px",
                 marginBottom: "16px",
@@ -208,10 +219,18 @@ export default function SignUp() {
                 },
               }}
             />
+
+            {error && (
+              <Alert severity="error" sx={{ marginBottom: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading} // Disable button while loading
               sx={{
                 marginTop: 3,
                 marginBottom: 2,
@@ -224,7 +243,7 @@ export default function SignUp() {
                 },
               }}
             >
-              Sign Up
+              {loading ? "Signing up..." : "Sign Up"}
             </Button>
             <Link
               href="/login"

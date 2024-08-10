@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Typography,
-  TextField,
   Button,
   Box,
   Link,
   Input,
+  Alert,
 } from "@mui/material";
 import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { auth } from "@/app/firebase/config";
@@ -17,20 +17,33 @@ import { useRouter } from "next/navigation";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [signInWithEmailAndPassword] = useSignInWithEmailAndPassword(auth);
+  const [error, setError] = useState(""); // State to manage errors
+  const [signInWithEmailAndPassword, user, loading, signInError] =
+    useSignInWithEmailAndPassword(auth);
   const router = useRouter();
+
+  // Update error state when signInError changes
+  useEffect(() => {
+    if (signInError) {
+      setError("Invalid email or password");
+    } else {
+      setError("");
+    }
+  }, [signInError]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError(""); // Reset error before attempting to sign in
     try {
       const res = await signInWithEmailAndPassword(email, password);
-      console.log(res);
-      setEmail("");
-      setPassword("");
-      sessionStorage.setItem("user", true);
-
-      router.push("/");
+      if (res) {
+        setEmail("");
+        setPassword("");
+        sessionStorage.setItem("user", true);
+        router.push("/");
+      }
     } catch (err) {
+      // If additional error handling is needed, it can be done here
       console.error(err);
     }
   };
@@ -63,11 +76,10 @@ export default function Login() {
           overflow: "hidden",
           backgroundColor: "#5a189a",
           padding: 10,
-          justifyContent: "center", // Center the login form
-          alignItems: "center", // Center the login form
+          justifyContent: "center",
+          alignItems: "center",
         }}
       >
-        {/* Right side login form */}
         <Box
           sx={{
             display: "flex",
@@ -165,10 +177,17 @@ export default function Login() {
               }}
             />
 
+            {error && (
+              <Alert severity="error" sx={{ marginBottom: 2 }}>
+                {error}
+              </Alert>
+            )}
+
             <Button
               type="submit"
               fullWidth
               variant="contained"
+              disabled={loading} // Disable button while loading
               sx={{
                 marginTop: 3,
                 marginBottom: 2,
@@ -181,7 +200,7 @@ export default function Login() {
                 },
               }}
             >
-              Login
+              {loading ? "Signing in..." : "Login"}
             </Button>
             <Link
               href="/signup"
