@@ -407,6 +407,11 @@ export default function Home() {
                 fullWidth
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    sendMessage();
+                  }
+                }}
                 disabled={isLoading}
                 sx={{
                   "& .MuiOutlinedInput-root": {
