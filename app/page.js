@@ -57,7 +57,7 @@ export default function Home() {
   const messagesEndRef = useRef(null);
   const [user] = useAuthState(auth);
   const router = useRouter();
-  const userSession = sessionStorage.getItem("user");
+  //const userSession = sessionStorage.getItem("user");
 
   const theme = createTheme({
     palette: {
@@ -127,7 +127,7 @@ export default function Home() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      sessionStorage.removeItem("user");
+      //sessionStorage.removeItem("user");
     } catch (err) {
       console.error("Failed to log out:", err);
     }
@@ -190,9 +190,9 @@ export default function Home() {
   };
 
   console.log("user:", user);
-  console.log("userSession:", userSession);
+  //console.log("userSession:", userSession);
 
-  if (!user && !userSession) {
+  if (!user) {
     router.push("/login");
   }
 

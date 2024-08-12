@@ -39,7 +39,7 @@ export default function Login() {
       if (res) {
         setEmail("");
         setPassword("");
-        sessionStorage.setItem("user", true);
+        //sessionStorage.setItem("user", true);
         router.push("/");
       }
     } catch (err) {
